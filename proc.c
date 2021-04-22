@@ -560,6 +560,6 @@ info(int param)
       break;
     default:
       return -1;
-      break; 
+      break;
   }
 }
