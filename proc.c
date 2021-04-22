@@ -532,3 +532,34 @@ procdump(void)
     cprintf("\n");
   }
 }
+
+//Our code here
+int
+info(int param)
+{
+  int returnValue = 0;
+  struct proc *p;
+
+  switch(param){
+    case 1:
+      acquire(&ptable.lock);
+      for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+        if(p->state != UNUSED)
+          returnValue++;
+      }
+      release(&ptable.lock);
+      return returnValue;
+      break;
+    case 2:
+      p = myproc();
+      return p->numSysCalls;
+      break;
+    case 3:
+      p = myproc();
+      return PGROUNDUP(p->sz) / PGSIZE;
+      break;
+    default:
+      return -1;
+      break; 
+  }
+}
