@@ -107,6 +107,5 @@ sys_tickets(void)
   if(argint(0, &n) < 0){
     return -1;
   }
-  // myproc()->tickets = n;
-  return n;
+  return tickets(n);
 }

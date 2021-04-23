@@ -568,14 +568,17 @@ info(int param)
 int
 tickets(int n)
 {
+  // this function sets the number of tickets to the given process
+  // default value of 10 is given for any process
+  
   struct proc *p;
   p = myproc();
-  
+
   if(n < 10){
     p->tickets = 10;
   }  
   else
   p->tickets = n;
-  
+  // cprintf("Tickets have been set: %d", p->tickets);
   return p->tickets;
 }

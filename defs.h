@@ -120,7 +120,8 @@ void            userinit(void);
 int             wait(void);
 void            wakeup(void*);
 void            yield(void);
-int             info(int);
+int             info(int);      //added info defs
+xint             tickets(int);
 
 // swtch.S
 void            swtch(struct context**, struct context*);

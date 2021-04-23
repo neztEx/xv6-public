@@ -6,9 +6,11 @@ int	main(int argc, char *argv[])
 {
     // FUNCTION_SETS_NUMBER_OF_TICKETS(30); //write your own function here
     
-    printf(1,"Tickets: %d\n", tickets(100));
+    int n = atoi(argv[1]);
+    
+    printf(1,"Tickets: %d\n", tickets(n));
     int	i, k;
-    const int loop = 43000;
+    const int loop = 1000; //43000
     for(i=0; i<loop; i++) {
             
         asm("nop"); //in order to prevent the compiler from optimizing the for loop
