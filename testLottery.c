@@ -5,12 +5,11 @@
 int	main(int argc, char *argv[])
 {
     // FUNCTION_SETS_NUMBER_OF_TICKETS(30); //write your own function here
-    
-    int n = atoi(argv[1]);
-    
-    printf(1,"Tickets: %d\n", tickets(n));
+    int v = atoi(argv[1]);
+    int n = tickets(atoi(argv[2]));
+
     int	i, k;
-    const int loop = 1000; //43000
+    const int loop = 4000; //43000
     for(i=0; i<loop; i++) {
             
         asm("nop"); //in order to prevent the compiler from optimizing the for loop
@@ -19,7 +18,8 @@ int	main(int argc, char *argv[])
             asm("nop");
         }
     }
-    printf(1,"Process complete\n");
+    printf(1,"Process%d ", v);
+    printf(1,"Tickets: %d\n", n);
 
     exit();
 }
