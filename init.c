@@ -32,6 +32,7 @@ main(void)
       exit();
     }
     while((wpid=wait()) >= 0 && wpid != pid)
-      printf(1, "zombie!\n");
+      wait(); //added for removing zombie
+      printf(1, "zombie!\n"); //original code
   }
 }
