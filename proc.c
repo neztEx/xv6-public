@@ -88,6 +88,7 @@ allocproc(void)
 found:
   p->state = EMBRYO;
   p->pid = nextpid++;
+  // p->tickets = 10;         //default tickets issued on process creation
 
   release(&ptable.lock);
 
@@ -562,4 +563,19 @@ info(int param)
       return -1;
       break;
   }
+}
+
+int
+tickets(int n)
+{
+  struct proc *p;
+  p = myproc();
+  
+  if(n < 10){
+    p->tickets = 10;
+  }  
+  else
+  p->tickets = n;
+  
+  return p->tickets;
 }

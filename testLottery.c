@@ -5,7 +5,8 @@
 int	main(int argc, char *argv[])
 {
     // FUNCTION_SETS_NUMBER_OF_TICKETS(30); //write your own function here
-
+    
+    printf(1,"Tickets: %d\n", tickets(100));
     int	i, k;
     const int loop = 43000;
     for(i=0; i<loop; i++) {
@@ -16,7 +17,7 @@ int	main(int argc, char *argv[])
             asm("nop");
         }
     }
-    printf(1,"Program Complete\n");
+    printf(1,"Process complete\n");
 
     exit();
 }
