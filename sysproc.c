@@ -109,3 +109,9 @@ sys_tickets(void)
   }
   return tickets(n);
 }
+
+int
+sys_tick(void)
+{
+  return tick();
+}

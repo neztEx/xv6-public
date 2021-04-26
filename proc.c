@@ -18,7 +18,16 @@ int nextpid = 1;
 extern void forkret(void);
 extern void trapret(void);
 
+
 static void wakeup1(void *chan);
+
+unsigned long randstate = 1;
+unsigned int
+rand(void)
+{
+  randstate = randstate * 1664525 + 1013904223;
+  return randstate;
+}
 
 void
 pinit(void)
@@ -88,7 +97,8 @@ allocproc(void)
 found:
   p->state = EMBRYO;
   p->pid = nextpid++;
-  // p->tickets = 10;         //default tickets issued on process creation
+  p->tickets = 10;         //default tickets issued on process creation
+  p->ticks = 0;
 
   release(&ptable.lock);
 
@@ -326,30 +336,46 @@ scheduler(void)
   struct proc *p;
   struct cpu *c = mycpu();
   c->proc = 0;
-  
+  unsigned int totalTickets = 0;
+
   for(;;){
     // Enable interrupts on this processor.
     sti();
 
     // Loop over process table looking for process to run.
     acquire(&ptable.lock);
+    totalTickets = 0;
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
       if(p->state != RUNNABLE)
         continue;
-
+      
+      totalTickets += p->tickets;
       // Switch to chosen process.  It is the process's job
       // to release ptable.lock and then reacquire it
       // before jumping back to us.
-      c->proc = p;
-      switchuvm(p);
-      p->state = RUNNING;
+    }    
+    int random = 0;
+    if(totalTickets){
+      random = rand() % totalTickets;
+    }    
+    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){ 
+      if(p->state != RUNNABLE)
+        continue;
+      random -= p->tickets;
+      if(random < 0){
+        c->proc = p;
+        switchuvm(p);
+        p->ticks++;
+        p->state = RUNNING;
 
-      swtch(&(c->scheduler), p->context);
-      switchkvm();
-
-      // Process is done running for now.
-      // It should have changed its p->state before coming back.
-      c->proc = 0;
+        swtch(&(c->scheduler), p->context);
+        switchkvm();
+        totalTickets+=p->tickets;
+        // Process is done running for now.
+        // It should have changed its p->state before coming back.
+        c->proc = 0;
+        break;
+      }
     }
     release(&ptable.lock);
 
@@ -581,4 +607,9 @@ tickets(int n)
   p->tickets = n;
   // cprintf("Tickets have been set: %d", p->tickets);
   return p->tickets;
+}
+
+int tick(void)
+{
+  return ticks;
 }

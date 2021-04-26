@@ -122,6 +122,7 @@ void            wakeup(void*);
 void            yield(void);
 int             info(int);      //added info defs
 int             tickets(int);
+int             tick(void);
 
 // swtch.S
 void            swtch(struct context**, struct context*);
