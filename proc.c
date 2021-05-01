@@ -99,6 +99,8 @@ found:
   p->pid = nextpid++;
   p->tickets = 10;         //default tickets issued on process creation
   p->ticks = 0;
+  p->stride = 1000;
+  p->pass = 0;
 
   release(&ptable.lock);
 
@@ -334,51 +336,42 @@ void
 scheduler(void)
 {
   struct proc *p;
+  struct proc *p1 = 0;
   struct cpu *c = mycpu();
   c->proc = 0;
-  unsigned int totalTickets = 0;
 
   for(;;){
     // Enable interrupts on this processor.
     sti();
-
+    p1 = 0;
     // Loop over process table looking for process to run.
     acquire(&ptable.lock);
-    totalTickets = 0;
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
       if(p->state != RUNNABLE)
         continue;
       
-      totalTickets += p->tickets;
+      if(p1 == 0 || p->pass < p1->pass){
+        p1 = p;
+      }
+    }
+    if(p1){
       // Switch to chosen process.  It is the process's job
       // to release ptable.lock and then reacquire it
       // before jumping back to us.
-    }    
-    int random = 0;
-    if(totalTickets){
-      random = rand() % totalTickets;
-    }    
-    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){ 
-      if(p->state != RUNNABLE)
-        continue;
-      random -= p->tickets;
-      if(random < 0){
-        c->proc = p;
-        switchuvm(p);
-        p->ticks++;
-        p->state = RUNNING;
+      c->proc = p1;
+      // cprintf("%d\n",p1);
+      switchuvm(p1);
+      p1->ticks++;
+      p1->pass += p1->stride;
+      p1->state = RUNNING;
 
-        swtch(&(c->scheduler), p->context);
-        switchkvm();
-        totalTickets+=p->tickets;
-        // Process is done running for now.
-        // It should have changed its p->state before coming back.
-        c->proc = 0;
-        break;
-      }
+      swtch(&(c->scheduler), p1->context);
+      switchkvm();
+      // Process is done running for now.
+      // It should have changed its p->state before coming back.
+      c->proc = 0;
     }
     release(&ptable.lock);
-
   }
 }
 
@@ -604,7 +597,8 @@ tickets(int n)
     p->tickets = 10;
   }  
   else
-  p->tickets = n;
+    p->tickets = n;
+  p->stride = 10000/n;
   // cprintf("Tickets have been set: %d", p->tickets);
   return p->tickets;
 }

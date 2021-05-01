@@ -51,7 +51,9 @@ struct proc {
   char name[16];               // Process name (debugging)
   int numSysCalls;             // Keeps track of number of system calls made
   int tickets;                 // Number of tickets for lottery
-  int ticks;
+  int ticks;                   // Num of ticks
+  long long pass;                    // stride sch
+  int stride;                  // stride sch
 };
 
 // Process memory is laid out contiguously, low addresses first:
