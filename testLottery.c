@@ -23,7 +23,7 @@ int	main(int argc, char *argv[])
     for(i = 0; i <43; i++){
         printf(1,"Process %d: %d Tickets and %d ticks\n", v, n, currentTicks[i]);
     }
-    printf(1,"Process %d: %d Tickets and %d ticks\n", v, n, tick() - startTicks);
+    // printf(1,"Process %d: %d Tickets and %d ticks\n", v, n, tick() - startTicks);
     
     exit();
 }
