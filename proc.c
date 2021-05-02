@@ -332,6 +332,8 @@ wait(void)
 //  - swtch to start running that process
 //  - eventually that process transfers control
 //      via swtch back to the scheduler.
+
+//STRIDE SCHEDULER
 void
 scheduler(void)
 {
@@ -373,6 +375,60 @@ scheduler(void)
     }
     release(&ptable.lock);
   }
+}
+
+
+//LOTTERY SCHEDULER (in order to use rename to 'scheduler(void)')
+void
+schedulerLottery(void)
+{
+ struct proc *p;
+ struct cpu *c = mycpu();
+ c->proc = 0;
+ unsigned int totalTickets = 0;
+
+ for(;;){
+   // Enable interrupts on this processor.
+   sti();
+
+   // Loop over process table looking for process to run.
+   acquire(&ptable.lock);
+   totalTickets = 0;
+   for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+     if(p->state != RUNNABLE)
+       continue;
+    
+     totalTickets += p->tickets;
+     // Switch to chosen process.  It is the process's job
+     // to release ptable.lock and then reacquire it
+     // before jumping back to us.
+   }   
+   int random = 0;
+   if(totalTickets){
+     random = rand() % totalTickets;
+   }   
+   for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+     if(p->state != RUNNABLE)
+       continue;
+     random -= p->tickets;
+     if(random < 0){
+       c->proc = p;
+       switchuvm(p);
+       p->ticks++;
+       p->state = RUNNING;
+
+       swtch(&(c->scheduler), p->context);
+       switchkvm();
+       totalTickets+=p->tickets;
+       // Process is done running for now.
+       // It should have changed its p->state before coming back.
+       c->proc = 0;
+       break;
+     }
+   }
+   release(&ptable.lock);
+
+ }
 }
 
 // Enter scheduler.  Must hold only ptable.lock
