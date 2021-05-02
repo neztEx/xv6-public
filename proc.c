@@ -96,11 +96,12 @@ allocproc(void)
 
 found:
   p->state = EMBRYO;
-  p->pid = nextpid++;
+  p->pid = nextpid++;       
+  p->numSysCalls = 0;      //init count to 0
   p->tickets = 10;         //default tickets issued on process creation
-  p->ticks = 0;
-  p->stride = 1000;
-  p->pass = 0;
+  p->ticks = 0;            //keep track of how many times the process is given cpu time
+  p->stride = 1000;        //calculate the stride for scheduler
+  p->pass = 0;             //init pass to 0 when process is created
 
   release(&ptable.lock);
 
@@ -335,7 +336,7 @@ wait(void)
 
 //STRIDE SCHEDULER
 void
-scheduler(void)
+schedulerStride(void)
 {
   struct proc *p;
   struct proc *p1 = 0;
@@ -380,7 +381,7 @@ scheduler(void)
 
 //LOTTERY SCHEDULER (in order to use rename to 'scheduler(void)')
 void
-schedulerLottery(void)
+scheduler(void)
 {
  struct proc *p;
  struct cpu *c = mycpu();

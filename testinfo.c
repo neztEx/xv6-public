@@ -3,9 +3,10 @@
 #include "user.h"
 
 int main(int argc, char *argv[]){
-    int i;
-    for(i = 1; i < 4; i++){
-        printf(1,"info(%d): %d\n", i, info(i));
-    }
+
+    printf(1,"Processes: %d\n", info(1));
+    printf(1,"System Calls: %d\n", info(2));
+    printf(1,"Memory Pages: %d\n", info(3));
+
     exit();
 }
